@@ -1,0 +1,39 @@
+[Global_Params]
+mode = 'benchmark'
+model_name = 'deepttc'
+generate_input_data = True
+benchmark_result_dir = 'results'
+use_lincs = False
+
+cancer_id = 'TCGA_DESC'
+drug_id = 'DRUG_ID'
+target_id = 'AUC'
+sample_id = 'COSMIC_ID'
+
+save_data = 'True'
+predictions_output = 'output/results.tsv'
+
+default_data_url = 'https://ftp.mcs.anl.gov/pub/candle/public/improve/reproducability/DeepTTC/'
+benchmark_dir = '/root/git/ModelTesting/benchmark/IMP_data'
+output_dir = 'output'
+rng_seed=1
+vocab_dir = 'GDSC_data'
+
+
+input_dim_drug = 2586
+transformer_emb_size_drug = 128
+dropout = 0.2
+transformer_n_layer_drug = 8
+transformer_intermediate_size_drug = 512
+transformer_num_attention_heads_drug = 8
+transformer_attention_probs_dropout = 0.1
+transformer_hidden_dropout_rate = 0.1
+learning_rate = 1e-4
+
+batch_size = 256
+epochs = 100
+
+input_dim_drug_classifier = 128
+input_dim_gene_classifier = 256
+input_dim_binding_classifier = 64
+use_binding = False
