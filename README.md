@@ -56,26 +56,25 @@ loss = MOORLELoss(
 )
 ```
 Dataset Class Details
+
+```
 The DrugResponseDataset class handles:
 
-*Label conversion to tensors
-*Drug ID processing and integer conversion
-*RNA and drug data conversion to TensorDicts
-*Efficient data retrieval during training
+Label conversion to tensors
+Drug ID processing and integer conversion
+RNA and drug data conversion to TensorDicts
+Efficient data retrieval during training
+```
 
 Each sample contains:
 
+```
 Gene expression tensor
 Drug encoding tensor
 Response label
 Drug ID
 Gene ID
-
-Loss Function Details
-The MOORLELoss function combines:
-
-Mean Squared Error (MSE) for each drug group
-Entropy-based regularization to encourage balanced predictions
+```
 
 Key components:
 
@@ -87,27 +86,28 @@ Regularization based on maximum possible entropy
 Parameters
 DrugResponseDataset
 
+```
 labels: List of response labels
 response_df: DataFrame with drug response data
 rna_df: DataFrame with RNA expression data
 drug_df: DataFrame with drug features
 device: Torch device (CPU/GPU)
 dtype: Tensor data type (default: torch.float)
-
+```
 MOORLELoss
-
+```
 predicted: Predicted values tensor
 drug_ids: Drug identifiers tensor
 label: True labels tensor
 device: Torch device (CPU/GPU)
 alpha: Regularization strength (default: 1)
-
+```
 Limitations
-
+```
 Requires GPU support for optimal performance
 Memory usage scales with dataset size
 Alpha parameter requires tuning for specific applications
-
+```
 
 # MOORLE LightGBM Implementation
 
@@ -128,8 +128,24 @@ MOORLE is designed to handle imbalanced datasets by incorporating multi-objectiv
 
 ```bash
 pip install lightgbm numpy scipy
+```
+Parameters
+The MOORLE loss function accepts the following parameters:
 
+```
+y_pred: Model predictions
+dtrain: Training dataset (ExtendedDataset instance)
+alpha: Regularization coefficient (default: 0.001)
+```
 
+#Implementation Details
+##Loss Computation
+The MOORLE loss consists of two components:
+
+```
+Mean squared error (MSE) for each group
+Entropy-based regularization term
+```
 Citations:
 
 Narykov, Oleksandr, et al. "Data Imbalance in Drug Response Prediction-Multi-Objective Optimization Approach in Deep Learning Setting." bioRxiv (2024): 2024-03.
