@@ -1,0 +1,85 @@
+import numpy as np
+from scipy.special import softmax, entr
+import lightgbm as lgb
+
+class ExtendedDataset(lgb.Dataset):
+    def __init__(self, data, label=None, domains=None, **kwargs):
+        """
+        Initialize the extended dataset with an optional `domains` attribute.
+        """
+        super().__init__(data, label=label, **kwargs)
+        self._domains = domains
+
+    def set_domains(self, domains):
+        """
+        Set the domains attribute.
+        """
+        self._domains = domains
+
+    def get_domains(self):
+        """
+        Get the domains attribute.
+        """
+        return self._domains
+
+
+def compute_loss(y_pred, y_true, group_ids, alpha=0.001):
+    """Compute the MOORLE loss value."""
+    unique_groups = np.unique(group_ids)
+    n_groups = len(unique_groups)
+    
+    if len(y_pred) < 2:
+        return np.mean((y_pred - y_true) ** 2)
+    
+    # Calculate MSE for each drug group
+    group_losses = np.zeros(n_groups)
+    for i, group_id in enumerate(unique_groups):
+        mask = group_ids == group_id
+        if np.sum(mask) > 0:
+            group_preds = y_pred[mask]
+            group_truth = y_true[mask]
+            group_losses[i] = np.mean((group_preds - group_truth) ** 2)
+    
+    # Calculate entropy components
+    group_dist = softmax(group_losses)
+    entropy = np.sum(entr(group_dist))
+    max_entropy = np.log(n_groups)
+    
+    reg_component = alpha * (max_entropy - entropy)
+    mean_loss = np.mean(group_losses)
+    
+    return mean_loss + reg_component
+
+
+def moorle_loss_lightgbm_numeric(y_pred, dtrain, alpha=0.001):
+    y_true = dtrain.get_label()
+    group_ids = dtrain.get_group()
+    
+    if not isinstance(y_pred, np.ndarray):
+        y_pred = np.array(y_pred)
+    
+    # Numerical gradient computation
+    eps = 1e-7
+    grad = np.zeros_like(y_pred)
+    hess = np.zeros_like(y_pred)
+    
+    # Calculate first order gradients
+    for i in range(len(y_pred)):
+        # Forward difference for gradient
+        y_pred_plus = y_pred.copy()
+        y_pred_plus[i] += eps
+        loss_plus = compute_loss(y_pred_plus, y_true, group_ids, alpha)
+        
+        y_pred_minus = y_pred.copy()
+        y_pred_minus[i] -= eps
+        loss_minus = compute_loss(y_pred_minus, y_true, group_ids, alpha)
+        
+        # Central difference formula for gradient
+        grad[i] = (loss_plus - loss_minus) / (2 * eps)
+        
+        # Second order derivative (hessian)
+        hess[i] = (loss_plus + loss_minus - 2 * compute_loss(y_pred, y_true, group_ids)) / (eps * eps)
+    
+    # Ensure hessians are positive for stability
+    hess = np.maximum(hess, 1e-5)
+    return grad, hess
