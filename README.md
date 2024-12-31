@@ -32,6 +32,7 @@ Usage
 pythonCopyfrom drug_response_dataset import DrugResponseDataset
 
 # Initialize dataset
+```
 dataset = DrugResponseDataset(
     labels=labels,
     response_df=response_df,
@@ -40,8 +41,10 @@ dataset = DrugResponseDataset(
     device=device,
     dtype=torch.float
 )
+```
 2. Using the MOORLE Loss
-pythonCopyfrom moorle_loss import MOORLELoss
+
+```pythonCopyfrom MOORLELoss import MOORLELoss
 
 # Calculate loss
 loss = MOORLELoss(
@@ -51,13 +54,14 @@ loss = MOORLELoss(
     device=device,
     alpha=1.0
 )
+```
 Dataset Class Details
 The DrugResponseDataset class handles:
 
-Label conversion to tensors
-Drug ID processing and integer conversion
-RNA and drug data conversion to TensorDicts
-Efficient data retrieval during training
+*Label conversion to tensors
+*Drug ID processing and integer conversion
+*RNA and drug data conversion to TensorDicts
+*Efficient data retrieval during training
 
 Each sample contains:
 
